@@ -22,7 +22,7 @@ def personaldir(app_name):
   if platform == 'windows':
     return os.path.join(os.environ['APPDATA'], app_name)
   else:
-    return os.path.expanduser('~/.%s/' % app_name)
+    return os.path.expanduser('~/.{}/'.format(app_name))
 
 # The system directory for settings storage.
 # Usually the default "/etc" directory.
@@ -30,7 +30,7 @@ def systemdir(app_name):
   if platform == 'windows':
     return os.path.join(os.environ['ProgramFiles'], app_name)
   else:
-    return "/etc/%s/" % app_name
+    return "/etc/{}/".format(app_name)
 
 # The local directory for settings storage.
 # Located in the same place as the rest of the modules
@@ -65,7 +65,7 @@ def getExistingFile(appname, filename, strict = False):
         except:
           pass
       filepath = os.path.join(d, filename)
-      if os.access(d, os.W_OK):
+      if os.access(d, os.R_OK):
         path = filepath
         break
   return path

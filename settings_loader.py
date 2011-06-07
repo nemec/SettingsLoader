@@ -13,6 +13,7 @@ class Settings(object):
     if config_ext is not None:
       self.config_ext = "." + config_ext.lstrip(".")
     self.__settings = default_settings
+    self.__loaded_filepath = None
     self.__appname = app_name
     self.__initialized = True
 
@@ -29,7 +30,6 @@ class Settings(object):
 
 
   def __setattr__(self, item, value):
-    print self.__dict__
     if not "_Settings__Initialized" in self.__dict__:
       return object.__setattr__(self, item, value)
     elif item in self.__dict__:
@@ -39,17 +39,15 @@ class Settings(object):
 
 
   def save_settings(self, filename = None):
-    if not filename:  
-      filename = self.__appname
-    filepath = platformdata.getExistingFile(self.__appname, filename + self.config_ext, False)
+    if not filename and self.__loaded_filepath:
+      filepath = self.__loaded_filepath
+    else:
+      if not filename:
+        filename = self.__appname
+      filepath = platformdata.getExistingFile(self.__appname, filename + self.config_ext, False)
     with open(filepath, "w") as settingsFile:
       for k in self.__settings:
-        settingsFile.write("%s = %s\n" % (k, self.__settings[k]))
-
-
-  # @TODO create the file if not exists
-  def create_settings_file(self, filename):
-    pass
+        settingsFile.write("{} = {}\n".format(k, self.__settings[k]))
 
 
   def load_settings(self, filename = None):
@@ -62,6 +60,7 @@ class Settings(object):
     with open(filepath,"r") as settingsFile:
         data = settingsFile.readlines()
     if data != None:
+      self.__loaded_filepath = filepath
       for line in data:
         line = line.strip()
         if len(line) == 0:
